@@ -770,6 +770,8 @@ export abstract class TransportImpl<
 
 		const dump = parseDataProducerDumpResponse(produceDataResponse);
 
+		console.log('--- produceData() produceDataResponse:', dump);
+
 		const dataProducer: DataProducer<DataProducerAppData> =
 			new DataProducerImpl({
 				internal: {
@@ -858,6 +860,11 @@ export abstract class TransportImpl<
 
 			this.#sctpStreamIds![sctpStreamId] = 1;
 			sctpStreamParameters.streamId = sctpStreamId;
+
+			console.log(
+				'----- Transoirt.consumeDatA() no direct transport, sctpStreamParameters:',
+				sctpStreamParameters
+			);
 		}
 		// If this is a DirectTransport, sctpStreamParameters must not be used.
 		else {

@@ -420,12 +420,14 @@ namespace RTC
 		// If ordered it must be reliable.
 		if (parameters.ordered)
 		{
+			MS_DUMP_STD("------- parameters.ordered");
 			spa.sendv_prinfo.pr_policy = SCTP_PR_SCTP_NONE;
 			spa.sendv_prinfo.pr_value  = 0;
 		}
 		// Configure reliability: https://tools.ietf.org/html/rfc3758
 		else
 		{
+			MS_DUMP_STD("------- !!!!! NO parameters.ordered NO");
 			spa.sendv_flags |= SCTP_SEND_PRINFO_VALID;
 			spa.sendv_sndinfo.snd_flags |= SCTP_UNORDERED;
 

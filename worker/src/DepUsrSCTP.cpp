@@ -13,9 +13,12 @@
 
 /* Static. */
 
-static constexpr size_t CheckerInterval{ 10u }; // In ms.
+// static constexpr size_t CheckerInterval{ 10u }; // In ms.
+static constexpr size_t CheckerInterval{ 1000u }; // In ms.
 static std::mutex GlobalSyncMutex;
 static size_t GlobalInstances{ 0u };
+
+static int TestDropSendMessages{ 0 };
 
 /* Static methods for usrsctp global callbacks. */
 
@@ -30,7 +33,24 @@ inline static int onSendSctpData(void* addr, void* data, size_t len, uint8_t /*t
 		return -1;
 	}
 
-	sctpAssociation->OnUsrSctpSendSctpData(data, len);
+	// sctpAssociation->OnUsrSctpSendSctpData(data, len);
+
+	++TestDropSendMessages;
+
+	if (TestDropSendMessages == 2) {
+		TestDropSendMessages = 0;
+	}
+
+	if (TestDropSendMessages == 0) {
+		MS_DUMP("***** sending message");
+
+		sctpAssociation->OnUsrSctpSendSctpData(data, len);
+	} else {
+		MS_DUMP("***** DROPPING message");
+
+		return -1;
+	}
+
 
 	// NOTE: Must not free data, usrsctp lib does it.
 
@@ -207,6 +227,15 @@ RTC::SctpAssociation* DepUsrSCTP::RetrieveSctpAssociation(uintptr_t id)
 	return it->second;
 }
 
+void DepUsrSCTP::PrintUsrctpGetTimeout()
+{
+	MS_TRACE();
+
+	MS_ASSERT(DepUsrSCTP::checker != nullptr, "Checker not created");
+
+	MS_DUMP("***** usrsctp_get_timeout(): %" PRId64, usrsctp_get_timeout());
+}
+
 /* DepUsrSCTP::Checker instance methods. */
 
 DepUsrSCTP::Checker::Checker() : timer(new TimerHandle(this))
@@ -224,6 +253,8 @@ DepUsrSCTP::Checker::~Checker()
 void DepUsrSCTP::Checker::Start()
 {
 	MS_TRACE();
+
+	MS_DUMP("***** usrsctp_get_timeout(): %" PRId64, usrsctp_get_timeout());
 
 	MS_DEBUG_TAG(sctp, "usrsctp periodic check started");
 
@@ -246,6 +277,8 @@ void DepUsrSCTP::Checker::Stop()
 void DepUsrSCTP::Checker::OnTimer(TimerHandle* /*timer*/)
 {
 	MS_TRACE();
+
+	MS_DUMP("***** usrsctp_get_timeout(): %" PRId64, usrsctp_get_timeout());
 
 	auto nowMs          = DepLibUV::GetTimeMs();
 	const int elapsedMs = this->lastCalledAtMs ? static_cast<int>(nowMs - this->lastCalledAtMs) : 0;

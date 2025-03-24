@@ -37,6 +37,7 @@ public:
 	static void RegisterSctpAssociation(RTC::SctpAssociation* sctpAssociation);
 	static void DeregisterSctpAssociation(RTC::SctpAssociation* sctpAssociation);
 	static RTC::SctpAssociation* RetrieveSctpAssociation(uintptr_t id);
+	static void PrintUsrctpGetTimeout();
 
 private:
 	thread_local static Checker* checker;

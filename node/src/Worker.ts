@@ -287,6 +287,7 @@ export class WorkerImpl<WorkerAppData extends AppData = AppData>
 			for (const line of buffer.toString('utf8').split('\n')) {
 				if (line) {
 					workerLogger.debug(`(stdout) ${line}`);
+					console.log(`(stdout) ${line}`);
 				}
 			}
 		});
@@ -296,6 +297,7 @@ export class WorkerImpl<WorkerAppData extends AppData = AppData>
 			for (const line of buffer.toString('utf8').split('\n')) {
 				if (line) {
 					workerLogger.error(`(stderr) ${line}`);
+					console.warn(`(stderr) ${line}`);
 				}
 			}
 		});
