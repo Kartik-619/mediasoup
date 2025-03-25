@@ -182,7 +182,7 @@ export class WorkerImpl<WorkerAppData extends AppData = AppData>
 				// fd 2 (stderr)  : Same as stdout.
 				// fd 3 (channel) : Producer Channel fd.
 				// fd 4 (channel) : Consumer Channel fd.
-				stdio: ['ignore', 'pipe', 'pipe', 'pipe', 'pipe'],
+				stdio: ['ignore', 'inherit', 'inherit', 'pipe', 'pipe'],
 				windowsHide: true,
 			}
 		);
@@ -283,7 +283,7 @@ export class WorkerImpl<WorkerAppData extends AppData = AppData>
 		});
 
 		// Be ready for 3rd party worker libraries logging to stdout.
-		this.#child.stdout!.on('data', buffer => {
+		this.#child.stdout?.on('data', buffer => {
 			for (const line of buffer.toString('utf8').split('\n')) {
 				if (line) {
 					workerLogger.debug(`(stdout) ${line}`);
@@ -293,7 +293,7 @@ export class WorkerImpl<WorkerAppData extends AppData = AppData>
 		});
 
 		// In case of a worker bug, mediasoup will log to stderr.
-		this.#child.stderr!.on('data', buffer => {
+		this.#child.stderr?.on('data', buffer => {
 			for (const line of buffer.toString('utf8').split('\n')) {
 				if (line) {
 					workerLogger.error(`(stderr) ${line}`);
